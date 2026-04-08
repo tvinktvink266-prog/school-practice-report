@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Электронный дневник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .student-list, .grades-list {
+            margin-top: 20px;
+        }
+
+        .student-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+
+        .student-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .student-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .grade-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grade-subject {
+            font-weight: bold;
+        }
+
+        .grade-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .average {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e0e7ff;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            padding: 5px 15px;
+
+
+font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .grade-5 { background: #d4edda; color: #155724; }
+        .grade-4 { background: #d1ecf1; color: #0c5460; }
+        .grade-3 { background: #fff3cd; color: #856404; }
+        .grade-2 { background: #f8d7da; color: #721c24; }
+
+        max-width: 768px {
+            .nav-btn {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Электронный дневник</h1>
+            <p>Система учёта успеваемости</p>
+        </header>
+        
+        <nav>
+            <button class="nav-btn active" onclick="showSection('addStudent', this)">➕ Добавить ученика</button>
+            <button class="nav-btn" onclick="showSection('addGrade', this)">📝 Добавить оценку</button>
+            <button class="nav-btn" onclick="showSection('viewAll', this)">👥 Все ученики</button>
+            <button class="nav-btn" onclick="showSection('viewStudent', this)">🔍 Оценки ученика</button>
+        </nav>
+        
+        <div class="content">
+            
+            <div id="addStudent" class="section">
+                <h2>Добавить нового ученика</h2>
+                <div class="form-group">
+                    <label>ФИО ученика:</label>
+                    <input type="text" id="studentName" placeholder="Например: Иванов Иван Иванович">
+                </div>
+                <button onclick="addStudent()">➕ Добавить ученика</button>
+            </div>
+            
+            
+            <div id="addGrade" class="section" style="display:none;">
+                <h2>Добавить оценку</h2>
+                <div class="form-group">
+                    <label>Выберите ученика:</label>
+                    <select id="gradeStudentSelect"></select>
+                </div>
+                <div class="form-group">
+                    <label>Предмет:</label>
+                    <input type="text" id="subject" placeholder="Например: Математика">
+                </div>
+                <div class="form-group">
+                    <label>Оценка:</label>
+                    <select id="grade">
+                        <option value="5">5 - Отлично</option>
+                        <option value="4">4 - Хорошо</option>
+                        <option value="3">3 - Удовлетворительно</option>
+                        <option value="2">2 - Неудовлетворительно</option>
+                    </select>
+                </div>
+                <button onclick="addGrade()">📝 Добавить оценку</button>
+            </div>
+            
+           
+            <div id="viewAll" class="section" style="display:none;">
+                <h2>Все ученики</h2>
+                <div id="allStudentsList" class="student-list"></div>
+            </div>
+            
+            
+            <div id="viewStudent" class="section" style="display:none;">
+                <h2>Просмотр оценок ученика</h2>
+                <div class="form-group">
+                    <label>Выберите ученика:</label>
+                    <select id="viewStudentSelect"></select>
+                </div>
+                <button onclick="viewStudentGrades()">🔍 Показать оценки</button>
+                <div id="studentGradesDisplay" class="grades-list" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      
+        let students = JSON.parse(localStorage.getItem('students'
+
+
+)) || [];
+
+       
+        function saveData() {
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+       
+        function updateSelects() {
+            const gradeSelect = document.getElementById('gradeStudentSelect');
+            const viewSelect = document.getElementById('viewStudentSelect');
+            
+            if (gradeSelect) {
+                gradeSelect.innerHTML = '<option value="">-- Выберите ученика --</option>';
+                students.forEach((student, index) => {
+                    gradeSelect.innerHTML += `<option value="${index}">${student.name}</option>`;
+                });
+            }
+            
+            if (viewSelect) {
+                viewSelect.innerHTML = '<option value="">-- Выберите ученика --</option>';
+                students.forEach((student, index) => {
+                    viewSelect.innerHTML += `<option value="${index}">${student.name}</option>`;
+                });
+            }
+        }
+
+       
+        function addStudent() {
+            const nameInput = document.getElementById('studentName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('❌ Введите ФИО ученика!');
+                return;
+            }
+            
+            students.push({
+                name: name,
+                grades: []
+            });
+            
+            saveData();
+            updateSelects();
+            nameInput.value = '';
+            alert('✅ Ученик успешно добавлен!');
+            
+            
+            if (document.getElementById('viewAll').style.display !== 'none') {
+                displayAllStudents();
+            }
+        }
+
+        
+        function addGrade() {
+            const studentIndex = document.getElementById('gradeStudentSelect').value;
+            const subject = document.getElementById('subject').value.trim();
+            const grade = document.getElementById('grade').value;
+            
+            if (studentIndex === '') {
+                alert('❌ Выберите ученика!');
+                return;
+            }
+            
+            if (!subject) {
+                alert('❌ Введите предмет!');
+                return;
+            }
+            
+            students[studentIndex].grades.push({
+                subject: subject,
+                grade: parseInt(grade)
+            });
+            
+            saveData();
+            document.getElementById('subject').value = '';
+            alert('✅ Оценка добавлена!');
+            
+          
+            if (document.getElementById('viewAll').style.display !== 'none') {
+                displayAllStudents();
+            }
+        }
+
+       
+        function displayAllStudents() {
+            const container = document.getElementById('allStudentsList');
+            
+            if (students.length === 0) {
+                container.innerHTML = '<div class="empty-message">📭 Нет добавленных учеников</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            students.forEach((student, index) => {
+                const average = student.grades.length > 0 
+                    ? (student.grades.reduce((sum, g) => sum + g.grade, 0) / student.grades.length).toFixed(2)
+                    : 'Нет оценок';
+                
+                const studentCard = document.createElement('div');
+                studentCard.className = 'student-card';
+                
+                let gradesHtml = '';
+                if (student.grades.length === 0) {
+                    gradesHtml = '<p style="color: #999; margin-top: 10px;">📭 Оценок пока нет</p>';
+                } else {
+                    gradesHtml = '<div style="margin-top: 10px;">';
+                    student.grades.forEach(g => {
+                        gradesHtml += `<div class="gra
+
+
+de-item">
+                            <span class="grade-subject">${g.subject}</span>
+                            <span class="grade-value grade-${g.grade} grade-badge">${g.grade}</span>
+                        </div>`;
+                    });
+                    gradesHtml += `<div class="average">📊 Средний балл: ${average}</div>`;
+                    gradesHtml += '</div>';
+                }
+                
+                studentCard.innerHTML = `
+                    <div class="student-name">
+                        ${student.name}
+                        <button class="delete-btn" onclick="deleteStudent(${index})">🗑️ Удалить</button>
+                    </div>
+                    ${gradesHtml}
+                `;
+                
+                container.appendChild(studentCard);
+            });
+        }
+
+        
+        function viewStudentGrades() {
+            const studentIndex = document.getElementById('viewStudentSelect').value;
+            const container = document.getElementById('studentGradesDisplay');
+            
+            if (studentIndex === '') {
+                alert('❌ Выберите ученика!');
+                return;
+            }
+            
+            const student = students[studentIndex];
+            
+            if (student.grades.length === 0) {
+                container.innerHTML = '<div class="empty-message">📭 У этого ученика пока нет оценок</div>';
+                return;
+            }
+            
+            const average = (student.grades.reduce((sum, g) => sum + g.grade, 0) / student.grades.length).toFixed(2);
+            
+            let gradesHtml = `<div class="student-card">
+                <div class="student-name">📖 ${student.name}</div>`;
+            
+            student.grades.forEach(g => {
+                gradesHtml += `<div class="grade-item">
+                    <span class="grade-subject">📘 ${g.subject}</span>
+                    <span class="grade-value grade-${g.grade} grade-badge">${g.grade}</span>
+                </div>`;
+            });
+            
+            gradesHtml += `<div class="average">📊 Средний балл: ${average}</div>`;
+            gradesHtml += `</div>`;
+            
+            container.innerHTML = gradesHtml;
+        }
+
+        
+        function deleteStudent(index) {
+            if (confirm(`Вы уверены, что хотите удалить ученика "${students[index].name}"?`)) {
+                students.splice(index, 1);
+                saveData();
+                updateSelects();
+                displayAllStudents();
+                alert('✅ Ученик удален');
+                
+                
+                const gradesDisplay = document.getElementById('studentGradesDisplay');
+                if (gradesDisplay) {
+                    gradesDisplay.innerHTML = '';
+                }
+            }
+        }
+
+       
+        function showSection(sectionId, buttonElement) {
+            
+            const sections = ['addStudent', 'addGrade', 'viewAll', 'viewStudent'];
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.style.display = 'none';
+                }
+            });
+            
+            
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+            }
+            
+           
+            const allButtons = document.querySelectorAll('.nav-btn');
+            allButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+            
+           
+            if (sectionId === 'viewAll') {
+                displayAllStudents();
+            }
+
+
+
+            updateSelects();
+        }
+
+       
+        window.onload = () => {
+            console.log('Дневник загружен!');
+            updateSelects();
+            displayAllStudents();
+           
+            showSection('addStudent', document.querySelector('.nav-btn'));
+        };
+    </script>
+</body>
+</html>
